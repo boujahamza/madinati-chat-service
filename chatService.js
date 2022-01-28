@@ -1,17 +1,18 @@
-const express = require("express");
-const jwt = require('jsonwebtoken');
-const sqlite = require('sqlite3');
+const chatService = require('express')()
+const http = require('http').createServer(chatService)
 
-var chatService = express();
 
-var db = new sqlite.Database("users.sqlite3");
+chatService.get('/', (req, res) => {
+    res.send("Node Server is running. Yay!!")
+})
 
-db.run(`CREATE TABLE IF NOT EXISTS users(
-  id INTEGER PRIMARY KEY,
-  username TEXT NOT NULL,
-  password TEXT NOT NULL
-)`);
+//Socket Logic
+const socketio = require('socket.io')(http)
 
-eventsService.post("/");
+socketio.on("connection", (userSocket) => {
+    userSocket.on("send_message", (data) => {
+        userSocket.broadcast.emit("receive_message", data)
+    })
+})
 
-eventsService.listen(3002);
+http.listen(process.env.PORT)
